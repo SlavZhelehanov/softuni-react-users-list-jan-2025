@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import userService from "../services/userService";
 
@@ -7,11 +7,11 @@ import Search from "./Search";
 import UserListItem from "./UserListItem";
 
 export default function UserList() {
+    const [users, setUsers] = useState([]);
     useEffect(() => {
         // Fetch all users from the server
         userService.getAllUsers().then(users => {
-        console.log(users);
-            // setUsers(users);
+            setUsers(users);
         });
     }, []);
 
