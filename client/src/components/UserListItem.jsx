@@ -1,3 +1,5 @@
+import fromISODate from "../utils/datetimeUtil";
+
 export default function UserListItem({ user }) {
     console.log(user);
     
@@ -10,7 +12,7 @@ export default function UserListItem({ user }) {
             <td>{user.lastName}</td>
             <td>{user.email}</td>
             <td>{user.phoneNumber}</td>
-            <td>June 28, 2022</td>
+            <td>{fromISODate(user.createdAt)}</td>
 
             <td className="actions">
                 <button className="btn edit-btn" title="Edit">
