@@ -5,9 +5,12 @@ import userService from "../services/userService";
 import Pagination from "./Pagination";
 import Search from "./Search";
 import UserListItem from "./UserListItem";
+import UserCreateEditForm from "./UserCreateEditForm";
 
 export default function UserList() {
     const [users, setUsers] = useState([]);
+    const [showCreateEditForm, setShowCreateEditForm] = useState(false);
+
     useEffect(() => {
         // Fetch all users from the server
         userService.getAllUsers().then(users => {
@@ -15,11 +18,17 @@ export default function UserList() {
         });
     }, []);
 
+    function addNewUserHandler(params) {
+        setShowCreateEditForm(true);
+    }
+
     return (
         <>
             <section className="card users-container">
                 {/* <!-- Search bar component --> */}
                 <Search />
+
+                {showCreateEditForm && <UserCreateEditForm />}
 
                 {/* <!-- Table component --> */}
                 <div className="table-wrapper">
@@ -156,7 +165,7 @@ export default function UserList() {
                 </div>
 
                 {/* <!-- New user button  --> */}
-                <button className="btn-add btn">Add new user</button>
+                <button className="btn-add btn" onClick={addNewUserHandler}>Add new user</button>
 
                 {/* <!-- Pagination component  --> */}
                 <Pagination />
