@@ -11,7 +11,7 @@ import UserInfo from "./UserInfo";
 export default function UserList() {
     const [users, setUsers] = useState([]);
     const [showCreateEditForm, setShowCreateEditForm] = useState(false);
-    const [showUserInfo, setShowUserInfo] = useState(false);
+    const [showUserInfo, setShowUserInfo] = useState(null);
 
     useEffect(() => {
         // Fetch all users from the server
@@ -42,7 +42,11 @@ export default function UserList() {
     }
 
     function userInfoClickHandler(userId) {
-        setShowUserInfo(true);
+        setShowUserInfo(userId);
+    }
+
+    function closeUserInfoHandler() {
+        setShowUserInfo(null);
     }
 
     return (
@@ -59,7 +63,10 @@ export default function UserList() {
                 )}
 
                 {showUserInfo && (
-                    <UserInfo />)}
+                    <UserInfo
+                        id={showUserInfo}
+                        onClose={closeUserInfoHandler}
+                    />)}
 
                 {/* <!-- Table component --> */}
                 <div className="table-wrapper">

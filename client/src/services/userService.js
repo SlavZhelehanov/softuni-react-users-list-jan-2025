@@ -5,6 +5,9 @@ export default {
         const users = await fetch(baseUrl).then(res => res.json());
         return Object.values(users);
     },
+    async getOneUser(id) {
+        return await fetch(`${baseUrl}/${id}`).then(res => res.json());
+    },
     async createNewUser(user) {
         user = {
             ...user,
