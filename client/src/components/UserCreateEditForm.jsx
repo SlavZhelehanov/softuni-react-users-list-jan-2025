@@ -1,4 +1,4 @@
-export default function UserCreateEditForm({ user, onClose }) {
+export default function UserCreateEditForm({ onSave, onClose }) {
     return (
         <div className="overlay">
             <div className="backdrop" onClick={onClose}></div>
@@ -15,7 +15,7 @@ export default function UserCreateEditForm({ user, onClose }) {
                             </svg>
                         </button>
                     </header>
-                    <form>
+                    <form onSubmit={onSave}>
                         <div className="form-row">
                             <div className="form-group">
                                 <label htmlFor="firstName">First name</label>

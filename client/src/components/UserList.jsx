@@ -26,13 +26,31 @@ export default function UserList() {
         setShowCreateEditForm(false);
     }
 
+    async function saveCreateEditFormHandler(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const formValues = Object.fromEntries(formData);
+
+        const newUser = await userService.createNewUser(formValues);
+
+        setUsers(oldState => [...oldState, newUser]);
+
+        setShowCreateEditForm(false);
+    }
+
     return (
         <>
             <section className="card users-container">
                 {/* <!-- Search bar component --> */}
                 <Search />
 
-                {showCreateEditForm && <UserCreateEditForm onClose={closeCreateEditFormHandler}/>}
+                {showCreateEditForm && (
+                    <UserCreateEditForm
+                        onClose={closeCreateEditFormHandler}
+                        onSave={saveCreateEditFormHandler}
+                    />
+                )}
 
                 {/* <!-- Table component --> */}
                 <div className="table-wrapper">
