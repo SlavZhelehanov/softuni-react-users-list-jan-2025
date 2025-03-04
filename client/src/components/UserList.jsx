@@ -18,8 +18,12 @@ export default function UserList() {
         });
     }, []);
 
-    function addNewUserHandler(params) {
+    function createNewUserHandler(params) {
         setShowCreateEditForm(true);
+    }
+
+    function closeCreateEditFormHandler() {
+        setShowCreateEditForm(false);
     }
 
     return (
@@ -28,7 +32,7 @@ export default function UserList() {
                 {/* <!-- Search bar component --> */}
                 <Search />
 
-                {showCreateEditForm && <UserCreateEditForm />}
+                {showCreateEditForm && <UserCreateEditForm onClose={closeCreateEditFormHandler}/>}
 
                 {/* <!-- Table component --> */}
                 <div className="table-wrapper">
@@ -165,7 +169,7 @@ export default function UserList() {
                 </div>
 
                 {/* <!-- New user button  --> */}
-                <button className="btn-add btn" onClick={addNewUserHandler}>Add new user</button>
+                <button className="btn-add btn" onClick={createNewUserHandler}>Add new user</button>
 
                 {/* <!-- Pagination component  --> */}
                 <Pagination />
