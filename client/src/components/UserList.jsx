@@ -7,11 +7,13 @@ import Search from "./Search";
 import UserListItem from "./UserListItem";
 import UserCreateEditForm from "./UserCreateEditForm";
 import UserInfo from "./UserInfo";
+import UserDelete from "./UserDelete";
 
 export default function UserList() {
     const [users, setUsers] = useState([]);
     const [showCreateEditForm, setShowCreateEditForm] = useState(false);
     const [showUserInfo, setShowUserInfo] = useState(null);
+    const [showDeleteUser, setShowDeleteUser] = useState(null);
 
     useEffect(() => {
         // Fetch all users from the server
@@ -49,6 +51,22 @@ export default function UserList() {
         setShowUserInfo(null);
     }
 
+    function deleteUserHandler(userId) {
+        setShowDeleteUser(userId);
+    }
+
+    function closeDeleteUserHandler() {
+        setShowDeleteUser(null);
+    }
+
+    async function userDeleteHandler() {
+        await userService.deleteUser(showDeleteUser);
+
+        setUsers(oldState => oldState.filter(u => u._id !== showDeleteUser));
+
+        setShowDeleteUser(null);
+    }
+
     return (
         <>
             <section className="card users-container">
@@ -66,7 +84,16 @@ export default function UserList() {
                     <UserInfo
                         id={showUserInfo}
                         onClose={closeUserInfoHandler}
-                    />)}
+                    />
+                )}
+
+                {showDeleteUser && (
+                    <UserDelete
+                        id={showDeleteUser}
+                        onClose={closeDeleteUserHandler}
+                        onDelete={userDeleteHandler}
+                    />
+                )}
 
                 {/* <!-- Table component --> */}
                 <div className="table-wrapper">
@@ -196,7 +223,12 @@ export default function UserList() {
                         </thead>
                         <tbody>
                             {users.map(user => (
-                                <UserListItem key={user._id} user={user} onInfoClick={userInfoClickHandler} />
+                                <UserListItem
+                                    key={user._id}
+                                    user={user}
+                                    onInfoClick={userInfoClickHandler}
+                                    onDeleteClick={deleteUserHandler}
+                                />
                             ))}
                         </tbody>
                     </table>

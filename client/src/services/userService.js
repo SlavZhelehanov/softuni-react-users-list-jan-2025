@@ -27,5 +27,8 @@ export default {
             body: JSON.stringify(user),
         });
         return await response.json();
+    },
+    async deleteUser(id) {
+        return await fetch(`${baseUrl}/${id}`, { method: "delete" }).then(res => res.json());
     }
 }
