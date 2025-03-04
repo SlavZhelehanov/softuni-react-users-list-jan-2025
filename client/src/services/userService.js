@@ -6,6 +6,18 @@ export default {
         return Object.values(users);
     },
     async createNewUser(user) {
+        user = {
+            ...user,
+            address: {
+                city: user.city,
+                country: user.country,
+                streetNumber: user.streetNumber,
+                street: user.street,
+            },
+            createdAt: new Date().toLocaleString(),
+            updatedAt: new Date().toLocaleString(),
+        }
+
         const response = await fetch(baseUrl, {
             method: "post",
             headers: { "Content-Type": "application/json" },
