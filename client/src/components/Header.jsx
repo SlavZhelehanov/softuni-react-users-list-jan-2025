@@ -2,7 +2,7 @@ export default function Header() {
     return (
         <header className="header">
             <div className="logo">
-                <span className="course">React Workshop - September 2023</span>
+                <span className="course">React Workshop - February 2025</span>
             </div>
         </header>
     );
