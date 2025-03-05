@@ -1,7 +1,7 @@
-export default function Search() {
+export default function Search({ onSearch }) {
     return (
         <>
-            <form className="search-form">
+            <form className="search-form" onSubmit={onSearch}>
                 <h2>
                     <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="user"
                         className="svg-inline--fa fa-user SearchBar_icon__cXpTg" role="img" xmlns="http://www.w3.org/2000/svg"
@@ -15,7 +15,7 @@ export default function Search() {
                 <div className="search-input-container">
                     <input type="text" placeholder="Please, select the search criteria" name="search" />
                     {/* <!-- Show the clear button only if input field length !== 0 --> */}
-                    <button className="btn close-btn">
+                    <button className="btn close-btn" type="submit">
                         <i className="fa-solid fa-xmark"></i>
                     </button>
 
@@ -28,10 +28,10 @@ export default function Search() {
                     <span>Search Criteria:</span>
                     <select name="criteria" className="criteria">
                         <option value="">Not selected</option>
-                        <option value="">First Name</option>
-                        <option value="">Last Name</option>
-                        <option value="">Email</option>
-                        <option value="">Phone</option>
+                        <option value="firstName">First Name</option>
+                        <option value="lastName">Last Name</option>
+                        <option value="email">Email</option>
+                        <option value="phoneNumber">Phone</option>
                     </select>
                 </div>
             </form>

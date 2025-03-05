@@ -79,23 +79,42 @@ export default function UserList() {
         const formData = new FormData(e.target);
         const formValues = Object.fromEntries(formData);
 
-        await userService.updateUser(showEditUser, formValues);                
+        await userService.updateUser(showEditUser, formValues);
 
         setUsers(oldState => {
             return oldState.map(u => {
-                if (u._id === showEditUser) return {formValues, _id: showEditUser};
+                if (u._id === showEditUser) return { formValues, _id: showEditUser };
                 return u;
             });
         });
 
         setShowEditUser(null);
-    }        
+    }
+
+    async function findSearchingHandler(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const formValues = Object.fromEntries(formData);
+
+        formValues.search = formValues.search.trim();
+        formValues.criteria = formValues.criteria.trim();
+
+        if (!formValues.search || !formValues.criteria) {
+            const allUsers = await userService.getAllUsers()
+            return setUsers(oldState => [...allUsers]);
+        }
+
+        setUsers(oldState => {
+            return oldState.filter(u => u[formValues.criteria].toLowerCase().includes(formValues.search.toLowerCase()));
+        });
+    }
 
     return (
         <>
             <section className="card users-container">
                 {/* <!-- Search bar component --> */}
-                <Search />
+                <Search onSearch={findSearchingHandler} />
 
                 {showCreateEditForm && (
                     <UserCreateEditForm
