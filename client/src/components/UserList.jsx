@@ -100,10 +100,10 @@ export default function UserList() {
         formValues.search = formValues.search.trim();
         formValues.criteria = formValues.criteria.trim();
 
-        if (!formValues.search || !formValues.criteria) {
-            const allUsers = await userService.getAllUsers()
-            return setUsers(oldState => [...allUsers]);
-        }
+        const allUsers = await userService.getAllUsers()
+        setUsers(oldState => [...allUsers]);
+
+        if (!formValues.search || !formValues.criteria) return;        
 
         setUsers(oldState => {
             return oldState.filter(u => u[formValues.criteria].toLowerCase().includes(formValues.search.toLowerCase()));
