@@ -16,7 +16,7 @@ export default function UserList() {
     const [showUserInfo, setShowUserInfo] = useState(null);
     const [showDeleteUser, setShowDeleteUser] = useState(null);
     const [showEditUser, setShowEditUser] = useState(null);
-    const [sortByFirstName, setSortByFirstName] = useState(false);
+    const [sortAscending, setSortAscending] = useState(false);
 
     useEffect(() => {
         // Fetch all users from the server
@@ -112,16 +112,24 @@ export default function UserList() {
         });
     }
 
-    function changeSortingByFirstNameHandler() {
-        setSortByFirstName(oldState => !oldState);
+    function changeSortingByCriteria(criteria) {
+        setSortAscending(oldState => !oldState);
 
-        if (sortByFirstName) {
+        if (sortAscending && criteria === "createdAt") {
             setUsers(oldState => {
-                return oldState.sort((a, b) => a.firstName.toLowerCase().localeCompare(b.firstName.toLowerCase()));
+                return oldState.sort((a, b) => new Date(a[criteria]) - new Date(b[criteria]));
+            });
+        } else if (sortAscending) {
+            setUsers(oldState => {
+                return oldState.sort((a, b) => a[criteria].toLowerCase().localeCompare(b[criteria].toLowerCase()));
+            });
+        } else if (criteria === "createdAt") {
+            setUsers(oldState => {
+                return oldState.sort((a, b) => new Date(b[criteria]) - new Date(a[criteria]));
             });
         } else {
             setUsers(oldState => {
-                return oldState.sort((a, b) => b.firstName.toLowerCase().localeCompare(a.firstName.toLowerCase()));
+                return oldState.sort((a, b) => b[criteria].toLowerCase().localeCompare(a[criteria].toLowerCase()));
             });
         }
     }
@@ -239,45 +247,20 @@ export default function UserList() {
                                 <th>
                                     Image
                                 </th>
-                                <th onClick={changeSortingByFirstNameHandler}>
-                                    First name{sortByFirstName ? arrow.up : arrow.down}
+                                <th onClick={() => changeSortingByCriteria("firstName")}>
+                                    First name{sortAscending ? arrow.up : arrow.down}
                                 </th>
-                                <th>
-                                    Last name<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-down"
-                                        className="icon svg-inline--fa fa-arrow-down Table_icon__+HHgn" role="img" xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 384 512">
-                                        <path fill="currentColor"
-                                            d="M374.6 310.6l-160 160C208.4 476.9 200.2 480 192 480s-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 370.8V64c0-17.69 14.33-31.1 31.1-31.1S224 46.31 224 64v306.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0S387.1 298.1 374.6 310.6z">
-                                        </path>
-                                    </svg>
+                                <th onClick={() => changeSortingByCriteria("lastName")}>
+                                    Last name{sortAscending ? arrow.up : arrow.down}
                                 </th>
-                                <th>
-                                    Email<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-down"
-                                        className="icon svg-inline--fa fa-arrow-down Table_icon__+HHgn" role="img" xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 384 512">
-                                        <path fill="currentColor"
-                                            d="M374.6 310.6l-160 160C208.4 476.9 200.2 480 192 480s-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 370.8V64c0-17.69 14.33-31.1 31.1-31.1S224 46.31 224 64v306.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0S387.1 298.1 374.6 310.6z">
-                                        </path>
-                                    </svg>
+                                <th onClick={() => changeSortingByCriteria("email")}>
+                                    Email{sortAscending ? arrow.up : arrow.down}
                                 </th>
-                                <th>
-                                    Phone<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-down"
-                                        className="icon svg-inline--fa fa-arrow-down Table_icon__+HHgn" role="img" xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 384 512">
-                                        <path fill="currentColor"
-                                            d="M374.6 310.6l-160 160C208.4 476.9 200.2 480 192 480s-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 370.8V64c0-17.69 14.33-31.1 31.1-31.1S224 46.31 224 64v306.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0S387.1 298.1 374.6 310.6z">
-                                        </path>
-                                    </svg>
+                                <th onClick={() => changeSortingByCriteria("phoneNumber")}>
+                                    Phone{sortAscending ? arrow.up : arrow.down}
                                 </th>
-                                <th>
-                                    Created
-                                    <svg aria-hidden="true" focusable="false" data-prefix="fas"
-                                        data-icon="arrow-down" className="icon active-icon svg-inline--fa fa-arrow-down Table_icon__+HHgn" role="img"
-                                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
-                                        <path fill="currentColor"
-                                            d="M374.6 310.6l-160 160C208.4 476.9 200.2 480 192 480s-16.38-3.125-22.62-9.375l-160-160c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 370.8V64c0-17.69 14.33-31.1 31.1-31.1S224 46.31 224 64v306.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0S387.1 298.1 374.6 310.6z">
-                                        </path>
-                                    </svg>
+                                <th onClick={() => changeSortingByCriteria("createdAt")}>
+                                    Created{sortAscending ? arrow.up : arrow.down}
                                 </th>
                                 <th>Actions</th>
                             </tr>
