@@ -14,6 +14,7 @@ export default function UserList() {
     const [showCreateEditForm, setShowCreateEditForm] = useState(false);
     const [showUserInfo, setShowUserInfo] = useState(null);
     const [showDeleteUser, setShowDeleteUser] = useState(null);
+    const [showEditUser, setShowEditUser] = useState(null);
 
     useEffect(() => {
         // Fetch all users from the server
@@ -28,6 +29,7 @@ export default function UserList() {
 
     function closeCreateEditFormHandler() {
         setShowCreateEditForm(false);
+        setShowEditUser(null);
     }
 
     async function saveCreateEditFormHandler(e) {
@@ -67,6 +69,28 @@ export default function UserList() {
         setShowDeleteUser(null);
     }
 
+    function editUserHandler(userId) {
+        setShowEditUser(userId);
+    }
+
+    async function saveEditUserClickHandler(e) {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const formValues = Object.fromEntries(formData);
+
+        await userService.updateUser(showEditUser, formValues);                
+
+        setUsers(oldState => {
+            return oldState.map(u => {
+                if (u._id === showEditUser) return {formValues, _id: showEditUser};
+                return u;
+            });
+        });
+
+        setShowEditUser(null);
+    }        
+
     return (
         <>
             <section className="card users-container">
@@ -92,6 +116,14 @@ export default function UserList() {
                         id={showDeleteUser}
                         onClose={closeDeleteUserHandler}
                         onDelete={userDeleteHandler}
+                    />
+                )}
+
+                {showEditUser && (
+                    <UserCreateEditForm
+                        userId={showEditUser}
+                        onClose={closeCreateEditFormHandler}
+                        onEdit={saveEditUserClickHandler}
                     />
                 )}
 
@@ -228,6 +260,7 @@ export default function UserList() {
                                     user={user}
                                     onInfoClick={userInfoClickHandler}
                                     onDeleteClick={deleteUserHandler}
+                                    onEditClick={editUserHandler}
                                 />
                             ))}
                         </tbody>

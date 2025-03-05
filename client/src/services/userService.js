@@ -30,5 +30,25 @@ export default {
     },
     async deleteUser(id) {
         return await fetch(`${baseUrl}/${id}`, { method: "delete" }).then(res => res.json());
+    },
+    async updateUser(userId, userData) {        
+        userData = {
+            _id: userId,
+            ...userData,
+            address: {
+                city: userData.city,
+                country: userData.country,
+                streetNumber: userData.streetNumber,
+                street: userData.street,
+            },
+            updatedAt: new Date().toLocaleString(),
+        }
+
+        const response = await fetch(`${baseUrl}/${userId}`, {
+            method: "put",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userData),
+        });
+        return await response.json();
     }
 }
