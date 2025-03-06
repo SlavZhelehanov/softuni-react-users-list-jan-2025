@@ -10,6 +10,7 @@ import UserInfo from "./UserInfo";
 import UserDelete from "./UserDelete";
 import arrow from "./TableHadeArrows";
 import NoUsersYet from "./NoUsersYet";
+import LoadingSpinner from "./LoadingSpinner";
 
 export default function UserList() {
     const [users, setUsers] = useState([]);
@@ -18,10 +19,12 @@ export default function UserList() {
     const [showDeleteUser, setShowDeleteUser] = useState(null);
     const [showEditUser, setShowEditUser] = useState(null);
     const [sortAscending, setSortAscending] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        // Fetch all users from the server
+        setLoading(true);
         userService.getAllUsers().then(users => {
+            setLoading(false);
             setUsers(users);
         });
     }, []);
@@ -38,13 +41,15 @@ export default function UserList() {
     async function saveCreateEditFormHandler(e) {
         e.preventDefault();
 
+        setLoading(true);
         const formData = new FormData(e.target);
         const formValues = Object.fromEntries(formData);
 
         const newUser = await userService.createNewUser(formValues);
 
+        setLoading(false);
         setUsers(oldState => [...oldState, newUser]);
-
+        
         setShowCreateEditForm(false);
     }
 
@@ -65,10 +70,12 @@ export default function UserList() {
     }
 
     async function userDeleteHandler() {
+        setLoading(true);
         await userService.deleteUser(showDeleteUser);
 
+        setLoading(false);
         setUsers(oldState => oldState.filter(u => u._id !== showDeleteUser));
-
+        
         setShowDeleteUser(null);
     }
 
@@ -78,24 +85,27 @@ export default function UserList() {
 
     async function saveEditUserClickHandler(e) {
         e.preventDefault();
+        setLoading(true);
 
         const formData = new FormData(e.target);
         const formValues = Object.fromEntries(formData);
 
         await userService.updateUser(showEditUser, formValues);
 
+        setLoading(false);
         setUsers(oldState => {
             return oldState.map(u => {
                 if (u._id === showEditUser) return { formValues, _id: showEditUser };
                 return u;
             });
         });
-
+        
         setShowEditUser(null);
     }
 
     async function findSearchingHandler(e) {
         e.preventDefault();
+        setLoading(true);
 
         const formData = new FormData(e.target);
         const formValues = Object.fromEntries(formData);
@@ -103,7 +113,9 @@ export default function UserList() {
         formValues.search = formValues.search.trim();
         formValues.criteria = formValues.criteria.trim();
 
-        const allUsers = await userService.getAllUsers()
+        const allUsers = await userService.getAllUsers();
+
+        setLoading(false);
         setUsers(oldState => [...allUsers]);
 
         if (!formValues.search || !formValues.criteria) return;
@@ -133,12 +145,11 @@ export default function UserList() {
                 return oldState.sort((a, b) => b[criteria].toLowerCase().localeCompare(a[criteria].toLowerCase()));
             });
         }
-    }
+    }    
 
     return (
         <>
             <section className="card users-container">
-                {/* <!-- Search bar component --> */}
                 <Search onSearch={findSearchingHandler} />
 
                 {showCreateEditForm && (
@@ -171,17 +182,10 @@ export default function UserList() {
                     />
                 )}
 
-                {/* <!-- Table component --> */}
                 <div className="table-wrapper">
-                    {/* <!-- Overlap components  --> */}
+                    {loading && <LoadingSpinner />}
 
-                    {/* <div className="loading-shade" /> */}
-                    {/* <!-- Loading spinner  --> */}
-                    {/* <!-- <div className="spinner"></div> --> */}
-                    {/* <!-- No users added yet  --> */}
-
-
-
+                    {users.length === 0 && loading && <NoUsersYet />}
 
                     {/* <!-- On error overlap component  --> */}
 
@@ -230,7 +234,7 @@ export default function UserList() {
                             </tr>
                         </thead>
                         <tbody>
-                            {0 < users.length ? users.map(user => (
+                            {users.map(user => (
                                 <UserListItem
                                     key={user._id}
                                     user={user}
@@ -238,7 +242,7 @@ export default function UserList() {
                                     onDeleteClick={deleteUserHandler}
                                     onEditClick={editUserHandler}
                                 />
-                            )) : <NoUsersYet />}
+                            ))}
                         </tbody>
                     </table>
                 </div>
