@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 
 import userService from "../services/userService";
 
@@ -15,6 +15,7 @@ import OnError from "./OnError";
 
 export default function UserList() {
     const [users, setUsers] = useState([]);
+    const [printedUsers, setPrintedUsers] = useState([]);
     const [showCreateEditForm, setShowCreateEditForm] = useState(false);
     const [showUserInfo, setShowUserInfo] = useState(null);
     const [showDeleteUser, setShowDeleteUser] = useState(null);
@@ -22,12 +23,19 @@ export default function UserList() {
     const [sortAscending, setSortAscending] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [itemsPerPage, setItemsPerPage] = useState(5);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     useEffect(() => {
         setLoading(true);
         setError(null);
 
         userService.getAllUsers().then(users => {
+            setTotalPages(Math.ceil(users.length / itemsPerPage));
+            setItemsPerPage(itemsPerPage);
+
+            setPrintedUsers(oldState => [...users.slice(0, itemsPerPage)]);
             setLoading(false);
             setUsers(users);
         }).catch(err => {
@@ -59,6 +67,7 @@ export default function UserList() {
 
             setLoading(false);
             setUsers(oldState => [...oldState, newUser]);
+            setPrintedUsers(users.slice(itemsPerPage * (currentPage - 1), itemsPerPage * currentPage));
 
             setShowCreateEditForm(false);
         } catch (error) {
@@ -92,6 +101,7 @@ export default function UserList() {
 
             setLoading(false);
             setUsers(oldState => oldState.filter(u => u._id !== showDeleteUser));
+            setPrintedUsers(users.slice(itemsPerPage * (currentPage - 1), itemsPerPage * currentPage));
 
             setShowDeleteUser(null);
         } catch (error) {
@@ -122,6 +132,7 @@ export default function UserList() {
                     return u;
                 });
             });
+            setPrintedUsers(users.slice(itemsPerPage * (currentPage - 1), itemsPerPage * currentPage));
 
             setShowEditUser(null);
         } catch (error) {
@@ -146,12 +157,14 @@ export default function UserList() {
 
             setLoading(false);
             setUsers(oldState => [...allUsers]);
+            setPrintedUsers(users.slice(itemsPerPage * (currentPage - 1), itemsPerPage * currentPage));
 
             if (!formValues.search || !formValues.criteria) return;
 
             setUsers(oldState => {
                 return oldState.filter(u => u[formValues.criteria].toLowerCase().includes(formValues.search.toLowerCase()));
             });
+            setPrintedUsers(users.slice(itemsPerPage * (currentPage - 1), itemsPerPage * currentPage));
         } catch (error) {
             setLoading(false);
             setError(error);
@@ -178,7 +191,54 @@ export default function UserList() {
                 return oldState.sort((a, b) => b[criteria].toLowerCase().localeCompare(a[criteria].toLowerCase()));
             });
         }
+        
+        setPrintedUsers(users.slice(itemsPerPage * (currentPage - 1), itemsPerPage * currentPage));
     }
+
+    function changeItemsCountHandler(items) {
+        setTotalPages(Math.ceil(users.length / items));
+        setItemsPerPage(items);
+        setPrintedUsers(users.slice(items * (currentPage - 1), items * currentPage));
+        console.log(printedUsers.length);
+        
+    }
+
+    function navigatePageArrow(direction) {
+        let skip = 0, take = itemsPerPage;
+
+        switch (direction) {
+            case "First Page": {
+                setCurrentPage(1);
+                setPrintedUsers(users.slice(0, itemsPerPage));
+                break;
+            }
+            case "Previous Page": {
+                if (1 < currentPage) {
+                    setCurrentPage(oldState => oldState - 1);
+                    setPrintedUsers(users.slice(itemsPerPage * (currentPage - 1), itemsPerPage * currentPage));
+                }
+                break;
+            }
+            case "Next Page": {
+                if (currentPage < totalPages) {
+                    setCurrentPage(oldState => oldState + 1);
+                    setPrintedUsers(users.slice(itemsPerPage * (currentPage - 1), itemsPerPage * currentPage));
+                }
+                break;
+            }
+            case "Last Page": {
+                setCurrentPage(totalPages);
+                setPrintedUsers(users.slice(itemsPerPage * (currentPage - 1)));
+                break;
+            }
+            default: { break; }
+        }
+
+        setLoading(false);
+        setPrintedUsers(users.slice(itemsPerPage * (currentPage - 1), itemsPerPage * currentPage));
+    }    
+    console.log(users.length % 15);
+    
 
     return (
         <>
@@ -247,7 +307,7 @@ export default function UserList() {
                             </tr>
                         </thead>
                         <tbody>
-                            {users.map(user => (
+                            {printedUsers.map(user => (
                                 <UserListItem
                                     key={user._id}
                                     user={user}
@@ -264,7 +324,12 @@ export default function UserList() {
                 <button className="btn-add btn" onClick={createNewUserHandler}>Add new user</button>
 
                 {/* <!-- Pagination component  --> */}
-                <Pagination />
+                <Pagination
+                    onChangeItems={changeItemsCountHandler}
+                    onArrowClick={navigatePageArrow}
+                    totalPages={totalPages}
+                    currentPage={currentPage}
+                />
             </section>
         </>
     );

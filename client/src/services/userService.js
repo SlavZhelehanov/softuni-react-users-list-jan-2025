@@ -31,7 +31,7 @@ export default {
     async deleteUser(id) {
         return await fetch(`${baseUrl}/${id}`, { method: "delete" }).then(res => res.json());
     },
-    async updateUser(userId, userData) {        
+    async updateUser(userId, userData) {
         userData = {
             _id: userId,
             ...userData,
@@ -50,5 +50,19 @@ export default {
             body: JSON.stringify(userData),
         });
         return await response.json();
+    },
+    async pagination(skip, take) {
+        // Login
+        const user = await fetch("http://localhost:3030/users/login", {
+            method: "post",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: "peter@abv.bg", password: "123456" }),
+        }).then(res => res.json());
+
+        // Get data
+        return fetch(`http://localhost:3030/data/usersData?offset=${skip}&pageSize=${take}`, {
+            method: "get",
+            headers: { "Content-Type": "application/json", "X-Authorization": user.accessToken }
+        }).then(res => res.json());
     }
-}
+};
